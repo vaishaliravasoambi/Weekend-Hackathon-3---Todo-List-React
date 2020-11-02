@@ -31,12 +31,13 @@ function App() {
           <h1>TODO-LIST</h1>
           <br />
           <input
+            id="task"
             value={inputList}
             type="text"
             placeholder="Add a items"
             onChange={itemEvent}
           />
-          <button className="add" onClick={listOfItems}>
+          <button id="btn" className="add" onClick={listOfItems}>
             +
           </button>
           <ol>
