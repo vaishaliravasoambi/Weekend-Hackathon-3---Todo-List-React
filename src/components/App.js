@@ -1,59 +1,93 @@
-import React, { useState } from "react";
+import React from "react";
 import "./../styles/App.css";
-import Todo from "./components/Todo";
+import { useState } from "react";
 function App() {
-  const [inputList, setInputList] = useState("");
-  const [items, setItems] = useState([]);
-
+  const [items, setItems] = useState("");
+  const [todoList, setTodoList] = useState([]);
+  const [todoId, setTodoId] = useState(0);
+  const [showEditBox, setShowEditBox] = useState(false);
+  const [editId, setEditId] = useState(1);
+  const [editBoxText, setEditBoxText] = useState("");
+  const handleChange = (event) => {
+    setItems(event.target.value);
+  };
+  const handleAdd = () => {
+    let todoListCopy = [...todoList];
+    todoListCopy.push({ id: todoId, text: items });
+    setTodoId(todoId + 1);
+    setTodoList(todoListCopy);
+    setItems("");
+  };
+  const handleEdit = (id) => {
+    setShowEditBox(!showEditBox);
+    setEditId(id);
+  };
   const handleDelete = (id) => {
-    console.log("deleted");
-    setItems((oldItems) => {
-      return oldItems.filter((arrEl, index) => {
-        return index !== id;
-      });
-    });
+    let newTodoList = todoList.filter((task) => task !== todoList[id]);
+    setTodoList(newTodoList);
+  };
+  const handleEditBox = (event) => {
+    let text = event.target.value;
+    setEditBoxText(text);
   };
 
-  const itemEvent = (e) => {
-    setInputList(e.target.value);
-  };
-  const listOfItems = () => {
-    setItems((oldItems) => {
-      return [...oldItems, inputList];
+  const saveEdit = () => {
+    const tempList = [...todoList];
+    tempList.forEach((task) => {
+      if (task.id === editId) {
+        task.text = editBoxText;
+      }
     });
-    setInputList("");
+    setTodoList(tempList);
+    setShowEditBox(false);
+    setEditBoxText("");
   };
+
   return (
     <>
-      <div className="main_div">
-        <div className="center_div">
-          <br />
-          <h1>TODO-LIST</h1>
-          <br />
-          <input
-            id="task"
-            value={inputList}
-            type="text"
-            placeholder="Add a items"
-            onChange={itemEvent}
-          />
-          <button id="btn" className="add" onClick={listOfItems}>
-            +
-          </button>
-          <ol>
-            {/* <li>{inputList}</li> */}
-            {items.map((itemvalue, index) => {
+      <div id="main">
+        <textarea id="task" value={items} onChange={handleChange} />
+        <button id="btn" disabled={!items} onClick={handleAdd}>
+          Add
+        </button>
+        <hr />
+        {todoList.length === 0 ? (
+          "No Task"
+        ) : (
+          <>
+            {todoList.map((task, id) => {
               return (
-                <Todo
-                  key={index}
-                  id={index}
-                  text={itemvalue}
-                  onSelect={handleDelete}
-                />
+                <div>
+                  <li key={id} className="list">
+                    {task.text}
+                  </li>
+                  <button className="edit" onClick={() => handleEdit(id)}>
+                    Edit
+                  </button>
+                  <button className="delete" onClick={() => handleDelete(id)}>
+                    Delete
+                  </button>
+                </div>
               );
             })}
-          </ol>
-        </div>
+          </>
+        )}
+        {showEditBox ? (
+          <div>
+            <textarea
+              className="editTask"
+              value={editBoxText}
+              onChange={handleEditBox}
+            />
+            <button
+              className="saveTask"
+              disabled={!editBoxText}
+              onClick={() => saveEdit()}
+            >
+              Save
+            </button>
+          </div>
+        ) : null}
       </div>
     </>
   );
